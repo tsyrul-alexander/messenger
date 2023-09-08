@@ -1,8 +1,16 @@
 <template>
-    <div v-for="message of messages" :key="message.id">
-      <div>{{ message.authorName }}</div>
-      <div>{{ message.body }}</div>
-    </div>
+    <DataView :value="messages" dataKey="id">
+        <template #list="slotProps">
+            <div class="col-12">
+                <div class="flex flex-column align-items-center sm:align-items-start">
+                    <div>{{ slotProps.data.createdAt }}</div>
+                    <div v-if="slotProps.data.type == 1">system</div>
+                    <div v-if="slotProps.data.type == 2">{{ slotProps.data.authorName }}</div>
+                    <div>{{ slotProps.data.body }}</div>
+                </div>
+            </div>
+        </template>
+    </DataView>
     <div>
         <InputText v-model="message"/>
         <Button :disabled="!message" @click="send">Send</Button>
@@ -46,14 +54,14 @@ export default defineComponent({
             this.connection.onclose = this.onClose;
         },
         async send() {
-            let response = await axios.post("/api/message", {
-                params: {
-                    message: this.message
-                }
-            });
+            this.connection?.send(JSON.stringify({
+                message: this.message
+            }));
         },
         onMessage(event: MessageEvent<any>) {
             console.log(event)
+            this.loadData()
+            return false;
         },
         onOpen(event: Event) {
             console.log(event)

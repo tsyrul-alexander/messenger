@@ -8,9 +8,10 @@ public interface IMessengerStore {
   Guid CreateRoom(Room room);
   Guid CreateUser(User user);
   void AddUserToRoom(Guid userId, Guid roomId);
-  void RemoveUser(Guid userId, Guid roomId);
+  void RemoveUserFromRoom(Guid userId, Guid roomId);
+  void RemoveUser(Guid userId);
   Guid CreateMessage(Message message, Guid roomId);
-  IEnumerable<Message> GetMessages(Guid roomId);
+  IEnumerable<MessageDetails> GetMessages(Guid roomId);
   User GetUser(Guid getUserId);
   Room GetUsersRoom(Guid userId);
 }

@@ -26,6 +26,8 @@ public class SessionController : ControllerBase {
       }
       Store.AddUserToRoom(userId.Value, roomId);
       await MessengerServer.ConnectAsync(webSocket, userId.Value);
+      Store.RemoveUserFromRoom(userId.Value, roomId);
+      Store.RemoveUser(userId.Value);
     } else {
       HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
     }

@@ -37,8 +37,12 @@ public class MemoryMessengerStore : IMessengerStore {
     Rooms[roomId].UserIds.Add(userId);
   }
 
-  public void RemoveUser(Guid userId, Guid roomId) {
-    throw new NotImplementedException();
+  public void RemoveUserFromRoom(Guid userId, Guid roomId) {
+    Rooms[roomId].UserIds.Remove(userId);
+  }
+
+  public void RemoveUser(Guid userId) {
+    Users.Remove(userId);
   }
 
   public Guid CreateMessage(Message message, Guid roomId) {
@@ -47,8 +51,19 @@ public class MemoryMessengerStore : IMessengerStore {
     return message.Id;
   }
 
-  public IEnumerable<Message> GetMessages(Guid roomId) {
+  public IEnumerable<MessageDetails> GetMessages(Guid roomId) {
     var room = Rooms[roomId];
-    return room.Messages;
+    return room.Messages.Select(message => {
+      var author = Users[message.AuthorId];
+      return new MessageDetails {
+        Id = message.Id,
+        CreatedAt = message.CreatedAt,
+        Type = message.Type,
+        Body = message.Body,
+        RoomId = message.RoomId,
+        AuthorId = message.AuthorId,
+        AuthorName = author.Name,
+      };
+    });
   }
 }
