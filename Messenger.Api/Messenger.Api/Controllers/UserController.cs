@@ -14,11 +14,18 @@ public class UserController : ControllerBase {
   public UserController(IMessengerStore store) {
     Store = store;
   }
+
+  public GetUsersResponse Get(Guid roomId) {
+    return new GetUsersResponse {
+      Results = Store.GetUsers(roomId).ToList()
+    };
+  }
   
   [HttpPost]
   public CreateUserResponse Post([FromBody] CreateUser request) {
     var userId = Store.CreateUser(new User {
-      Name = request.Name
+      Name = request.Name,
+      PublicKey = request.PublicKey
     });
     Response.SetUserId(userId);
     return new CreateUserResponse {

@@ -11,6 +11,10 @@ public class MemoryMessengerStore : IMessengerStore {
     return Rooms.Values;
   }
 
+  public IEnumerable<User> GetUsers(Guid roomId) {
+    return Rooms[roomId].UserIds.Select(id => Users[id]);
+  }
+
   public Room GetRoom(Guid id) {
     return Rooms[id];
   }

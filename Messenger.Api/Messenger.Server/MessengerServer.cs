@@ -73,7 +73,7 @@ public class MessengerServer {
   }
   
   protected virtual void CloseSocket(Guid userId) {
-    throw new NotImplementedException();
+    Connections.Remove(userId);
   }
   
   private UserMessage GetUserMessage(byte[] buffer) {
