@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messenger.Api", "Messenger.Api\Messenger.Api.csproj", "{50E6B5E8-50EA-4E76-AA90-E247E50EC4FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messenger.Core", "Messenger.Core\Messenger.Core.csproj", "{177E0D0C-47FD-4D70-B2B9-60EF4E164892}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messenger.Store", "Messenger.Store\Messenger.Store.csproj", "{2E98825F-A156-4DC0-9AD5-609B3EC4773F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Messenger.Server", "Messenger.Server\Messenger.Server.csproj", "{3FD53A4C-D5B2-4874-ABFB-2A9E58C73549}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{50E6B5E8-50EA-4E76-AA90-E247E50EC4FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50E6B5E8-50EA-4E76-AA90-E247E50EC4FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50E6B5E8-50EA-4E76-AA90-E247E50EC4FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50E6B5E8-50EA-4E76-AA90-E247E50EC4FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{177E0D0C-47FD-4D70-B2B9-60EF4E164892}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{177E0D0C-47FD-4D70-B2B9-60EF4E164892}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{177E0D0C-47FD-4D70-B2B9-60EF4E164892}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{177E0D0C-47FD-4D70-B2B9-60EF4E164892}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E98825F-A156-4DC0-9AD5-609B3EC4773F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E98825F-A156-4DC0-9AD5-609B3EC4773F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E98825F-A156-4DC0-9AD5-609B3EC4773F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E98825F-A156-4DC0-9AD5-609B3EC4773F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FD53A4C-D5B2-4874-ABFB-2A9E58C73549}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FD53A4C-D5B2-4874-ABFB-2A9E58C73549}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FD53A4C-D5B2-4874-ABFB-2A9E58C73549}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FD53A4C-D5B2-4874-ABFB-2A9E58C73549}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
