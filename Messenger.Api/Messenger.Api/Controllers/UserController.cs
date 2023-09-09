@@ -15,6 +15,7 @@ public class UserController : ControllerBase {
     Store = store;
   }
 
+  [HttpGet]
   public GetUsersResponse Get(Guid roomId) {
     return new GetUsersResponse {
       Results = Store.GetUsers(roomId).ToList()

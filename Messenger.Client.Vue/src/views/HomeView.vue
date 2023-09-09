@@ -17,7 +17,8 @@ export default defineComponent({
     methods: {
       async create() {
         await axios.post("/api/user", {
-          name: this.userName
+          name: this.userName,
+          publicKey: this.$secureService.getPublicKey()
         });
         this.$router.push({
           name: "rooms"

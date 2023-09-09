@@ -1,4 +1,8 @@
 <template>
+    <div v-for="user of users" :key="user.id">
+        {{ user.name }}
+        {{ user.publicKey }}
+    </div>
     <DataView :value="messages" dataKey="id">
         <template #list="slotProps">
             <div class="col-12">
@@ -20,7 +24,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import type { Message } from '@/model'
+import type { Message, User } from '@/model'
 import axios from 'axios'
 
 export default defineComponent({
@@ -30,22 +34,31 @@ export default defineComponent({
     data() {
         return {
             messages: [] as Message[],
+            users: [] as User[],
             connection: null as WebSocket | null,
             message: null as string | null
         }
     },
     mounted() {
-        this.loadData()
+        this.loadMessages()
         this.listen()
     },
     methods: {
-        async loadData() {
+        async loadMessages() {
             let response = await axios.get("/api/message", {
                 params: {
                     roomId: this.id
                 }
             });
             this.messages = response.data?.results || [];
+        },
+        async loadUsers() {
+            let response = await axios.get("/api/user", {
+                params: {
+                    roomId: this.id
+                }
+            });
+            this.users = response.data?.results || [];
         },
         async listen() {
             this.connection = new WebSocket(`ws://${window.location.host}/listen?roomId=${this.id}`)
@@ -60,7 +73,7 @@ export default defineComponent({
         },
         onMessage(event: MessageEvent<any>) {
             console.log(event)
-            this.loadData()
+            this.loadMessages()
             return false;
         },
         onOpen(event: Event) {

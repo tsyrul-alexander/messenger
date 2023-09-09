@@ -10,8 +10,10 @@ import InputText from 'primevue/inputText';
 import DataView from 'primevue/dataView';
 import Dialog from 'primevue/dialog';
 import StyleClass from 'primevue/styleclass';
+import { SecureService } from './services/secure';
 
 const app = createApp(App)
+app.config.globalProperties.$secureService = new SecureService();
 app.use(PrimeVue);
 app.use(router)
 app.directive('styleclass', StyleClass);
