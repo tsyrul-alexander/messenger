@@ -41,6 +41,7 @@ export default defineComponent({
     },
     mounted() {
         this.loadMessages()
+        this.loadUsers()
         this.listen()
     },
     methods: {
