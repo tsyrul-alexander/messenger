@@ -8,11 +8,9 @@ namespace Messenger.Api.Controllers;
 [ApiController]
 public class SessionController : ControllerBase {
   public MessengerServer MessengerServer { get; }
-  public IMessengerStore Store { get; }
 
-  public SessionController(MessengerServer messengerServer, IMessengerStore store) {
+  public SessionController(MessengerServer messengerServer) {
     MessengerServer = messengerServer;
-    Store = store;
   }
   
   [HttpGet]
@@ -24,10 +22,7 @@ public class SessionController : ControllerBase {
       if (userId == null) {
         throw new Exception("No user id");
       }
-      Store.AddUserToRoom(userId.Value, roomId);
-      await MessengerServer.ConnectAsync(webSocket, userId.Value);
-      Store.RemoveUserFromRoom(userId.Value, roomId);
-      Store.RemoveUser(userId.Value);
+      await MessengerServer.ConnectAsync(webSocket, userId.Value, roomId);
     } else {
       HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
     }

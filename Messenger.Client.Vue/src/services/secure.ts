@@ -117,7 +117,7 @@ export class SecureService {
       }
 
       textToArrayBuffer(str: string) {
-        var buf = decodeURI(encodeURIComponent(str))
+        var buf = decodeURI(str)
         var bufView = new Uint8Array(buf.length)
         for (var i=0; i < buf.length; i++) {
           bufView[i] = buf.charCodeAt(i)

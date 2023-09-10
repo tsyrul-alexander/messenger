@@ -15,22 +15,23 @@ public class MessengerServer {
     Store = store;
   }
   
-  public async Task ConnectAsync(WebSocket socket, Guid userId) {
+  public async Task ConnectAsync(WebSocket socket, Guid userId, Guid roomId) {
     Connections[userId] = socket;
+    Store.AddUserToRoom(userId, roomId);
     await BroadcastUser(userId);
     await ListenAsync(userId);
   }
 
   private async Task ListenAsync(Guid userId) {
     while (true) {
-      var buffer = new ArraySegment<byte>(new byte[1024]);
+      var buffer = new ArraySegment<byte>(new byte[2048]);
       var socket = Connections[userId];
       var result = await socket.ReceiveAsync(buffer, CancellationToken.None);
       if (result.MessageType == WebSocketMessageType.Close) {
         await DisconnectUser(userId);
         return;
       }
-      var userMessage = GetUserMessage(buffer.ToArray());
+      var userMessage = GetUserMessage(buffer[..result.Count].ToArray());
       await BroadcastMessage(userMessage, userId);
     }
   }
@@ -79,6 +80,9 @@ public class MessengerServer {
   }
 
   protected virtual async Task BroadcastMessage(Guid userId, byte[] message) {
+    if (!Connections.ContainsKey(userId)) {
+      return;
+    }
     var socket = Connections[userId];
     var segment = new ArraySegment<byte>(message);
     if (socket.State != WebSocketState.Open) {
@@ -90,6 +94,9 @@ public class MessengerServer {
   
   protected virtual async Task DisconnectUser(Guid userId) {
     Connections.Remove(userId);
+    var room = Store.GetUsersRoom(userId);
+    Store.RemoveUserFromRoom(userId, room.Id);
+    Store.RemoveUser(userId);
     await BroadcastUser(userId);
   }
   

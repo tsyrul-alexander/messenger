@@ -73,10 +73,11 @@ export default defineComponent({
                 const user = this.users[i];
                 messages[user.id] = await this.encryptMessage(user, this.message as string)
             }
-            console.log(messages);
-            this.connection?.send(JSON.stringify({
+            const messageJson = JSON.stringify({
                 messages: messages
-            }));
+            });
+            console.log(messageJson);
+            this.connection?.send(messageJson);
             this.message = null;
         },
         encryptMessage(user: User, message: string) : Promise<string> {
