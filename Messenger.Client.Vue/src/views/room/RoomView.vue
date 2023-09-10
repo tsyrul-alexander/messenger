@@ -1,30 +1,37 @@
 <template>
-    <div v-for="user of users" :key="user.id">
-        {{ user.name }}
-        {{ user.publicKey }}
-    </div>
-    <DataView :value="messages" dataKey="id">
-        <template #list="slotProps">
-            <div class="col-12">
-                <div class="flex flex-column align-items-center sm:align-items-start">
-                    <div>{{ slotProps.data.createdAt }}</div>
-                    <div v-if="slotProps.data.type == 1">system</div>
-                    <div v-if="slotProps.data.type == 2">{{ slotProps.data.authorName }}</div>
-                    <div>{{ slotProps.data.body }}</div>
+    <Splitter style="height: 300px" class="mb-5">
+        <SplitterPanel class="flex align-items-center justify-content-center">
+            <Fieldset legend="Users" class="min-w-full">
+                <div class="room-users flex-2">
+                    <div v-for="user of users" :key="user.id" class="room-user">
+                        {{ user.name }}
+                        <Divider />
+                    </div>
+                </div>
+            </Fieldset>
+        </SplitterPanel>
+        <SplitterPanel class="flex align-items-center justify-content-center">
+            <div class="min-w-full">
+                <ScrollPanel style="width: 100%; height: 200px">
+                    <div v-for="message of messages" :key="message.id" class="room-message">
+                        {{ message.authorName }}: {{ message.body }}
+                    </div>
+                </ScrollPanel>
+                <Divider />
+                <div>
+                    <InputText v-model="message" placeholder="Enter text"/>
+                    <Button :disabled="!message" @click="send">Send</Button>
                 </div>
             </div>
-        </template>
-    </DataView>
-    <div>
-        <InputText v-model="message"/>
-        <Button :disabled="!message" @click="send">Send</Button>
-    </div>
+        </SplitterPanel>
+        
+    </Splitter>
   </template>
   
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import type { Message, User } from '@/model'
+import { MessageType, type Message, type User } from '@/model'
 import axios from 'axios'
 
 export default defineComponent({
@@ -40,19 +47,9 @@ export default defineComponent({
         }
     },
     mounted() {
-        this.loadMessages()
-        this.loadUsers()
         this.listen()
     },
     methods: {
-        async loadMessages() {
-            let response = await axios.get("/api/message", {
-                params: {
-                    roomId: this.id
-                }
-            });
-            this.messages = response.data?.results || [];
-        },
         async loadUsers() {
             let response = await axios.get("/api/user", {
                 params: {
@@ -68,20 +65,54 @@ export default defineComponent({
             this.connection.onclose = this.onClose;
         },
         async send() {
+            if (!this.message) {
+                return;
+            }
+            const messages: {[key: string]: string} = {}
+            for (let i = 0; i < this.users.length; i++) {
+                const user = this.users[i];
+                messages[user.id] = await this.encryptMessage(user, this.message as string)
+            }
+            console.log(messages);
             this.connection?.send(JSON.stringify({
-                message: this.message
+                messages: messages
             }));
+            this.message = null;
+        },
+        encryptMessage(user: User, message: string) : Promise<string> {
+            return this.$secureService.encrypt(user.publicKey, message);
+        },
+        decryptMessage(message: string) : Promise<string> {
+            return this.$secureService.decrypt(message);
         },
         onMessage(event: MessageEvent<any>) {
             console.log(event)
-            this.loadMessages()
+            const message = JSON.parse(event.data);
+            if (message.type === MessageType.User) {
+                this.onNewUserMessage(message)
+            } else if (message.type === MessageType.Message) {
+                this.onNewMessage(message)
+            }
             return false;
+        },
+        onNewUserMessage(message: any) {
+            this.loadUsers();
+        },
+        async onNewMessage(message: any) {
+            const decryptBody = await this.decryptMessage(message.body)
+            this.messages.push({
+                id: message.id,
+                createdAt: message.createdAt,
+                body: decryptBody,
+                authorName: message.authorName
+            });
         },
         onOpen(event: Event) {
             console.log(event)
+            this.loadUsers()
         },
         onClose(event: CloseEvent) {
-            console.log(event);
+            console.log(event)
             this.$router.push({
                 name: "home"
             })

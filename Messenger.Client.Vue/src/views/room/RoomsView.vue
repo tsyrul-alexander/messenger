@@ -1,12 +1,12 @@
 <template>
     <div>
         <RoomCreateView></RoomCreateView>
-        <div v-for="room of rooms" :key="room.id">
-        <div>
+        <div class="rooms">
+            <div v-for="room of rooms" :key="room.id" class="room">
             <router-link :to="`/room/${room.id}`">
                 {{ room.name }}
             </router-link>
-            </div>
+        </div>
         </div>
     </div>
 </template>

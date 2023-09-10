@@ -1,6 +1,8 @@
 <template>
-   <InputText v-model="userName"/>
-   <Button @click="create">Connect</Button>
+   <div>
+    <InputText v-model="userName"/>
+    <Button @click="create">Connect</Button>
+   </div>
 </template>
 
 <script lang="ts">

@@ -16,8 +16,8 @@ public class MessengerServer {
   }
   
   public async Task ConnectAsync(WebSocket socket, Guid userId) {
-    Connections.Add(userId, socket);
-    await BroadcastNewUser(userId);
+    Connections[userId] = socket;
+    await BroadcastUser(userId);
     await ListenAsync(userId);
   }
 
@@ -27,38 +27,54 @@ public class MessengerServer {
       var socket = Connections[userId];
       var result = await socket.ReceiveAsync(buffer, CancellationToken.None);
       if (result.MessageType == WebSocketMessageType.Close) {
-        CloseSocket(userId);
+        await DisconnectUser(userId);
         return;
       }
       var userMessage = GetUserMessage(buffer.ToArray());
-      var room = Store.GetUsersRoom(userId);
-      var message = new Message {
-        RoomId = room.Id,
-        AuthorId = userId,
-        Type = MessageType.User,
-        Body = userMessage.Message
-      };
-      Store.CreateMessage(message, room.Id);
-      await BroadcastMessage(message);
+      await BroadcastMessage(userMessage, userId);
     }
   }
 
-  protected virtual Task BroadcastNewUser(Guid userId) {
-    var room = Store.GetUsersRoom(userId);
+  protected virtual Task BroadcastUser(Guid senderId) {
+    var room = Store.GetUsersRoom(senderId);
     var message = new Message {
       RoomId = room.Id,
-      AuthorId = userId,
-      Type = MessageType.System,
-      Body = $"Welcome to {room.Name}!"
+      AuthorId = senderId,
+      Type = MessageType.User
     };
-    message.Id = Store.CreateMessage(message, room.Id);
-    return BroadcastMessage(message);
+    return BroadcastMessage(message, senderId);
   }
   
-  protected virtual async Task BroadcastMessage(Message message) {
+  protected virtual async Task BroadcastMessage(UserMessage userMessage, Guid senderId) {
+    var sender = Store.GetUser(senderId);
+    var room = Store.GetUsersRoom(senderId);
+    var createdAt = DateTime.UtcNow;
+    foreach (var recipientId in room.UserIds) {
+      if (!userMessage.Messages.TryGetValue(recipientId, out var messageBody)) {
+        continue;
+      }
+      var message = new Message {
+        Id = Guid.NewGuid(),
+        CreatedAt = createdAt,
+        AuthorId = senderId,
+        AuthorName = sender.Name,
+        Type = MessageType.Message,
+        Body = messageBody,
+        RoomId = room.Id
+      };
+      var buffer = GetBuffer(message);
+      await BroadcastMessage(recipientId, buffer);
+    }
+  }
+  
+  protected virtual async Task BroadcastMessage(Message message, Guid senderId) {
     var buffer = GetBuffer(message);
-    foreach (var connection in Connections) {
-      await BroadcastMessage(connection.Key, buffer);
+    var room = Store.GetUsersRoom(senderId);
+    foreach (var recipientId in room.UserIds) {
+      if (recipientId == senderId) {
+        continue;
+      }
+      await BroadcastMessage(recipientId, buffer);
     }
   }
 
@@ -66,14 +82,15 @@ public class MessengerServer {
     var socket = Connections[userId];
     var segment = new ArraySegment<byte>(message);
     if (socket.State != WebSocketState.Open) {
-      CloseSocket(userId);
+      await DisconnectUser(userId);
       return;
     }
     await socket.SendAsync(segment, WebSocketMessageType.Text, true, CancellationToken.None);
   }
   
-  protected virtual void CloseSocket(Guid userId) {
+  protected virtual async Task DisconnectUser(Guid userId) {
     Connections.Remove(userId);
+    await BroadcastUser(userId);
   }
   
   private UserMessage GetUserMessage(byte[] buffer) {

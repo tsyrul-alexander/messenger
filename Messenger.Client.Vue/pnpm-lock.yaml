@@ -11,6 +11,9 @@ dependencies:
   axios:
     specifier: ^1.5.0
     version: 1.5.0
+  primeflex:
+    specifier: ^3.3.1
+    version: 3.3.1
   primevue:
     specifier: ^3.34.1
     version: 3.34.1(vue@3.3.4)
@@ -1886,6 +1889,10 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
     dev: true
+
+  /primeflex@3.3.1:
+    resolution: {integrity: sha512-zaOq3YvcOYytbAmKv3zYc+0VNS9Wg5d37dfxZnveKBFPr7vEIwfV5ydrpiouTft8MVW6qNjfkaQphHSnvgQbpQ==}
+    dev: false
 
   /primevue@3.34.1(vue@3.3.4):
     resolution: {integrity: sha512-5QPy8I+TMYSQgC0Bs/9vINsOVjgCOQFAr6uz49Wzcj8u04qJ2mG/z6OhAana+f4yKTTHVwHLVnuGkrIp/nI9DA==}

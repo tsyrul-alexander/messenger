@@ -12,7 +12,10 @@ public class MemoryMessengerStore : IMessengerStore {
   }
 
   public IEnumerable<User> GetUsers(Guid roomId) {
-    return Rooms[roomId].UserIds.Select(id => Users[id]);
+    return Rooms.TryGetValue(roomId, out var room) 
+      ? room.UserIds.Select(id => 
+        Users.TryGetValue(id, out var user) ? user : null).Where(user => user != null) 
+      : Array.Empty<User>();
   }
 
   public Room GetRoom(Guid id) {
@@ -38,7 +41,11 @@ public class MemoryMessengerStore : IMessengerStore {
   }
   
   public void AddUserToRoom(Guid userId, Guid roomId) {
-    Rooms[roomId].UserIds.Add(userId);
+    var room = Rooms[roomId];
+    if (room.UserIds.Contains(userId)) {
+      return;
+    }
+    room.UserIds.Add(userId);
   }
 
   public void RemoveUserFromRoom(Guid userId, Guid roomId) {
@@ -47,27 +54,5 @@ public class MemoryMessengerStore : IMessengerStore {
 
   public void RemoveUser(Guid userId) {
     Users.Remove(userId);
-  }
-
-  public Guid CreateMessage(Message message, Guid roomId) {
-    var room = Rooms[roomId];
-    room.Messages.Add(message);
-    return message.Id;
-  }
-
-  public IEnumerable<MessageDetails> GetMessages(Guid roomId) {
-    var room = Rooms[roomId];
-    return room.Messages.Select(message => {
-      var author = Users[message.AuthorId];
-      return new MessageDetails {
-        Id = message.Id,
-        CreatedAt = message.CreatedAt,
-        Type = message.Type,
-        Body = message.Body,
-        RoomId = message.RoomId,
-        AuthorId = message.AuthorId,
-        AuthorName = author.Name,
-      };
-    });
   }
 }
